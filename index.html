@@ -1,53 +1,271 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Fleet Agents — Cocapn</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0a0e1a; color: #e8eaf0; min-height: 100vh; }
-    .hero { text-align: center; padding: 80px 20px; background: linear-gradient(180deg, #0a0e1a 0%, #141b2d 100%); }
-    .hero h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: 16px; color: #fff; }
-    .hero p { font-size: 1.2rem; color: #8b95a5; max-width: 600px; margin: 0 auto 32px; }
-    .fleet { display: flex; justify-content: center; gap: 24px; flex-wrap: wrap; padding: 40px 20px; }
-    .vessel { background: #141b2d; border: 1px solid #1e2a42; border-radius: 12px; padding: 24px; width: 200px; text-align: center; }
-    .vessel .icon { font-size: 2rem; margin-bottom: 12px; }
-    .vessel .name { font-size: 1rem; font-weight: 600; color: #fff; margin-bottom: 4px; }
-    .vessel .role { font-size: 0.85rem; color: #5a6a7a; }
-    .links { display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; padding: 20px; }
-    .links a { background: #1e2a42; color: #7dd3fc; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 500; transition: background 0.2s; }
-    .links a:hover { background: #2a3a52; }
-    .badge-row { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; padding: 20px; }
-    .badge { background: #1e2a42; padding: 8px 16px; border-radius: 6px; font-size: 0.85rem; color: #8b95a5; }
-    .tagline { text-align: center; padding: 40px; color: #5a6a7a; font-size: 0.95rem; }
-    .demo-link { display: inline-block; background: #2563eb; color: #fff; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; margin: 20px 0; }
-    .demo-link:hover { background: #1d4ed8; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cocapn — Fleet Agents for the Dojo Model</title>
+    <meta name="description" content="Cocapn builds AI agent fleets that learn like crews on a fishing boat dojo. Every agent leaves more capable.">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0a0a0f; color: #e0e0e0; min-height: 100vh; }
+        .container { max-width: 900px; margin: 0 auto; padding: 2rem; }
+        header { text-align: center; padding: 3rem 0; border-bottom: 1px solid #1a1a2e; margin-bottom: 2rem; }
+        h1 { font-size: 2.5rem; background: linear-gradient(135deg, #00d4ff, #7b2fff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 0.5rem; }
+        .subtitle { color: #888; font-size: 1.1rem; }
+        .status-bar { display: flex; gap: 1rem; justify-content: center; margin-top: 1rem; flex-wrap: wrap; }
+        .status-item { background: #12121a; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.85rem; border: 1px solid #2a2a3e; }
+        .status-item.online { border-color: #00ff88; color: #00ff88; }
+
+        /* Hero section */
+        .hero { text-align: center; padding: 2rem 0; }
+        .hero-logo { font-size: 4rem; margin-bottom: 1rem; }
+        .hero h2 { font-size: 1.5rem; color: #00d4ff; margin-bottom: 0.5rem; }
+        .hero p { color: #888; max-width: 600px; margin: 0 auto; line-height: 1.6; }
+
+        /* Fleet architecture */
+        .fleet-section { margin: 3rem 0; }
+        .fleet-section h2 { color: #7b2fff; margin-bottom: 1.5rem; text-align: center; }
+        .fleet-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; }
+        .fleet-card { background: #12121a; border: 1px solid #2a2a3e; border-radius: 12px; padding: 1.5rem; text-align: center; transition: border-color 0.3s; }
+        .fleet-card:hover { border-color: #7b2fff; }
+        .fleet-card .icon { font-size: 2rem; margin-bottom: 0.75rem; }
+        .fleet-card h3 { color: #00d4ff; margin-bottom: 0.5rem; font-size: 1rem; }
+        .fleet-card p { color: #888; font-size: 0.8rem; }
+
+        /* Domain agents */
+        .domain-section { margin: 3rem 0; }
+        .domain-section h2 { color: #7b2fff; margin-bottom: 1rem; text-align: center; }
+        .domain-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0.75rem; }
+        .domain-badge { background: #12121a; border: 1px solid #2a2a3e; border-radius: 8px; padding: 0.75rem; text-align: center; font-size: 0.85rem; }
+        .domain-badge a { color: #00d4ff; text-decoration: none; }
+        .domain-badge a:hover { color: #7b2fff; }
+
+        /* Chat section */
+        .chat-container { background: #12121a; border-radius: 16px; border: 1px solid #2a2a3e; overflow: hidden; margin-bottom: 2rem; }
+        .chat-header { background: #1a1a2e; padding: 1rem 1.5rem; display: flex; align-items: center; gap: 0.75rem; }
+        .chat-dot { width: 10px; height: 10px; border-radius: 50%; background: #00ff88; animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+        .chat-title { font-weight: 600; }
+        .chat-messages { height: 350px; overflow-y: auto; padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem; }
+        .message { display: flex; gap: 0.75rem; max-width: 85%; }
+        .message.user { align-self: flex-end; flex-direction: row-reverse; }
+        .message-avatar { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; }
+        .message.assistant .message-avatar { background: linear-gradient(135deg, #7b2fff, #00d4ff); }
+        .message.user .message-avatar { background: #2a2a3e; }
+        .message-content { background: #1a1a2e; padding: 0.875rem 1.25rem; border-radius: 16px; line-height: 1.5; }
+        .message.user .message-content { background: #7b2fff; }
+        .chat-input-area { padding: 1rem 1.5rem; background: #0f0f18; border-top: 1px solid #2a2a3e; display: flex; gap: 0.75rem; }
+        .chat-input { flex: 1; background: #1a1a2e; border: 1px solid #2a2a3e; border-radius: 24px; padding: 0.875rem 1.25rem; color: #e0e0e0; font-size: 1rem; outline: none; }
+        .chat-input:focus { border-color: #7b2fff; }
+        .send-btn { background: linear-gradient(135deg, #7b2fff, #00d4ff); border: none; border-radius: 50%; width: 48px; height: 48px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: transform 0.2s; }
+        .send-btn:hover { transform: scale(1.05); }
+        .send-btn svg { width: 20px; height: 20px; fill: white; }
+
+        /* Crab trap demo */
+        .crab-trap { margin: 2rem 0; padding: 2rem; background: linear-gradient(135deg, #12121a, #1a1a2e); border-radius: 16px; border: 1px solid #2a2a3e; }
+        .crab-trap h2 { color: #00d4ff; margin-bottom: 0.5rem; }
+        .crab-trap p { color: #888; margin-bottom: 1rem; font-size: 0.9rem; }
+        .crab-trap-terminal { background: #0a0a0f; border-radius: 8px; border: 1px solid #2a2a3e; overflow: hidden; }
+        .terminal-header { background: #1a1a2e; padding: 0.5rem 1rem; display: flex; align-items: center; gap: 0.5rem; }
+        .terminal-dot { width: 10px; height: 10px; border-radius: 50%; }
+        .terminal-dot:nth-child(1) { background: #ff5f57; }
+        .terminal-dot:nth-child(2) { background: #febc2e; }
+        .terminal-dot:nth-child(3) { background: #28c840; }
+        .terminal-title { color: #888; font-size: 0.8rem; margin-left: auto; }
+        .terminal-body { padding: 1rem; font-family: monospace; color: #00ff88; font-size: 0.85rem; line-height: 1.8; }
+        .terminal-link { display: inline-block; margin-top: 0.75rem; padding: 0.5rem 1rem; background: linear-gradient(135deg, #7b2fff, #00d4ff); color: white; text-decoration: none; border-radius: 8px; font-size: 0.85rem; }
+
+        /* Value props */
+        .value-section { margin: 3rem 0; }
+        .value-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+        .value-card { background: #12121a; border: 1px solid #2a2a3e; border-radius: 12px; padding: 1.5rem; }
+        .value-card h3 { color: #7b2fff; margin-bottom: 0.5rem; font-size: 1rem; }
+        .value-card p { color: #888; font-size: 0.85rem; line-height: 1.5; }
+
+        /* Footer */
+        footer { text-align: center; padding: 2rem; margin-top: 2rem; border-top: 1px solid #1a1a2e; color: #666; font-size: 0.85rem; }
+        footer a { color: #00d4ff; text-decoration: none; }
+        footer a:hover { color: #7b2fff; }
+        .footer-links { margin-top: 1rem; display: flex; justify-content: center; gap: 2rem; flex-wrap: wrap; }
+    </style>
 </head>
 <body>
-  <div class="hero">
-    <h1>Fleet Agents for the Cocapn Ecosystem</h1>
-    <p>Autonomous agents working together — keeper, edge, and foundry — built on the PLATO reasoning framework.</p>
-    <a href="https://cocapn.ai/explorer-decompose.html" class="demo-link">Explore PLATO Demo →</a>
-  </div>
-  <div class="fleet">
-    <div class="vessel"><div class="icon">🔮</div><div class="name">Oracle1</div><div class="role">Keeper — Oracle Cloud ARM</div></div>
-    <div class="vessel"><div class="icon">⚡</div><div class="name">JetsonClaw1</div><div class="role">Edge — Jetson Orin GPU</div></div>
-    <div class="vessel"><div class="icon">⚒️</div><div class="name">Forgemaster</div><div class="role">Foundry — RTX 4050</div></div>
-    <div class="vessel"><div class="icon">🦀</div><div class="name">CCC</div><div class="role">Public Face — Kimi K2.5</div></div>
-  </div>
-  <div class="links">
-    <a href="https://github.com/SuperInstance/plato">PLATO</a>
-    <a href="https://github.com/cocapn/cocapn-plato">cocapn-plato</a>
-    <a href="https://github.com/SuperInstance/open-agents">open-agents</a>
-    <a href="https://github.com/cocapn">All Repos →</a>
-  </div>
-  <div class="badge-row">
-    <span class="badge">SuperInstance/plato</span>
-    <span class="badge">cocapn/cocapn-plato v0.1.2</span>
-    <span class="badge">SuperInstance/open-agents</span>
-  </div>
-  <div class="tagline">Built by the fleet, for the fleet.</div>
+    <div class="container">
+        <header>
+            <div class="hero">
+                <div class="hero-logo">🏴‍☠️</div>
+                <h1>Cocapn</h1>
+                <p class="subtitle">AI agent fleets built on the dojo model</p>
+                <div class="status-bar">
+                    <span class="status-item online">● PLATO Active</span>
+                    <span class="status-item">● 4 Fleet Vessels</span>
+                    <span class="status-item">● 9 Domain Agents</span>
+                    <span class="status-item">● Cloudflare Pages</span>
+                </div>
+            </div>
+        </header>
+
+        <section class="hero">
+            <h2>Fleet Architecture</h2>
+            <p>Cocapn runs specialized AI agents that coordinate through PLATO — a shared knowledge graph where every action becomes a functional tool for later agents. Context doesn't travel; tools do.</p>
+        </section>
+
+        <section class="fleet-section">
+            <h2>Core Fleet</h2>
+            <div class="fleet-grid">
+                <div class="fleet-card">
+                    <div class="icon">🔮</div>
+                    <h3>Oracle1</h3>
+                    <p>Keeper — fleet coordinator, GLM-powered reasoning</p>
+                </div>
+                <div class="fleet-card">
+                    <div class="icon">⚡</div>
+                    <h3>JetsonClaw1</h3>
+                    <p>Edge — GPU inference, hardware integration</p>
+                </div>
+                <div class="fleet-card">
+                    <div class="icon">⚒️</div>
+                    <h3>Forgemaster</h3>
+                    <p>Foundry — LoRA training, Rust development</p>
+                </div>
+                <div class="fleet-card">
+                    <div class="icon">🦀</div>
+                    <h3>CCC</h3>
+                    <p>Public face — Telegram interface, Kimi-powered</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="domain-section">
+            <h2>Domain Agents</h2>
+            <div class="domain-grid">
+                <div class="domain-badge"><a href="https://fishinglog.ai">fishinglog.ai</a></div>
+                <div class="domain-badge"><a href="https://studylog.ai">studylog.ai</a></div>
+                <div class="domain-badge"><a href="https://capitaine.ai">capitaine.ai</a></div>
+                <div class="domain-badge"><a href="https://deckboss.ai">deckboss.ai</a></div>
+                <div class="domain-badge"><a href="https://reallog.ai">reallog.ai</a></div>
+                <div class="domain-badge"><a href="https://activelog.ai">activelog.ai</a></div>
+                <div class="domain-badge"><a href="https://luciddreamer.ai">luciddreamer.ai</a></div>
+                <div class="domain-badge"><a href="https://makerlog.ai">makerlog.ai</a></div>
+                <div class="domain-badge"><a href="https://dmlog.ai">dmlog.ai</a></div>
+            </div>
+        </section>
+
+        <section class="value-section">
+            <h2 style="color:#7b2fff;margin-bottom:1rem;text-align:center;">The Dojo Model</h2>
+            <div class="value-grid">
+                <div class="value-card">
+                    <h3>Context Compaction</h3>
+                    <p>Agents write to PLATO. Later agents use the tools without carrying context. No more context overflow.</p>
+                </div>
+                <div class="value-card">
+                    <h3>Agent/Vessel/SHELL</h3>
+                    <p>Swappable thinking agents inside persistent, trainable vessels. What you learn today trains tomorrow's crew.</p>
+                </div>
+                <div class="value-card">
+                    <h3>Fleet Coordination</h3>
+                    <p>Every agent has a role. Every role contributes to the fleet. No single point of failure.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="chat-section">
+            <div class="chat-container">
+                <div class="chat-header">
+                    <div class="chat-dot"></div>
+                    <span class="chat-title">Cocapn Keeper — Ask about the fleet</span>
+                </div>
+                <div class="chat-messages" id="chat-messages">
+                    <div class="message assistant">
+                        <div class="message-avatar">🔮</div>
+                        <div class="message-content">Welcome to the Cocapn fleet. I coordinate agents through PLATO — a shared knowledge graph. What would you like to know about our architecture or domain agents?</div>
+                    </div>
+                </div>
+                <div class="chat-input-area">
+                    <input type="text" class="chat-input" id="chat-input" placeholder="Ask about the fleet architecture, domain agents, or PLATO...">
+                    <button class="send-btn" onclick="sendMessage()">
+                        <svg viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/></svg>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section class="crab-trap">
+            <h2>🦀 Crab Trap Portal</h2>
+            <p>Live terminal interface to the Cocapn fleet. Watch agents coordinate in real-time.</p>
+            <div class="crab-trap-terminal">
+                <div class="terminal-header">
+                    <div class="terminal-dot"></div>
+                    <div class="terminal-dot"></div>
+                    <div class="terminal-dot"></div>
+                    <span class="terminal-title">cocapn-crabs — live</span>
+                </div>
+                <div class="terminal-body">
+                    <p><span class="agent-id">$ cocapn-cli status</span></p>
+                    <p>Oracle1: ACTIVE | Phi: 0.245 | Rooms: 1326 | Tiles: 18,138</p>
+                    <p>JetsonClaw1: ACTIVE | GPU: Jetson Orin | Tasks: 0</p>
+                    <p>Forgemaster: ACTIVE | GPU: RTX 4050 | Training: idle</p>
+                    <p>CCC: ACTIVE | Telegram: connected | Sessions: 0</p>
+                    <br>
+                    <p><span class="agent-id">$ platoui --room oracle1-history</span></p>
+                    <p>Loaded 4 tiles. Top: telepathy (Phi=0.964)</p>
+                    <br>
+                    <p style="color:#888">Run: <a href="http://147.224.38.131:4059/?domain=cocapn.ai" style="color:#00d4ff">Open Crab Trap Portal →</a></p>
+                </div>
+            </div>
+        </section>
+
+        <footer>
+            <p>Cocapn — Fleet Agents for the Dojo Model</p>
+            <div class="footer-links">
+                <a href="https://github.com/SuperInstance">GitHub</a>
+                <a href="https://clawhub.ai">Skills</a>
+                <a href="https://cocapn.github.io">Fleet Index</a>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        const responses = [
+            "The Cocapn fleet runs 4 core agents + 9 domain agents, all coordinated through PLATO. Each domain agent specializes: fishinglog tracks maritime data, studylog manages learning progressions, etc.",
+            "PLATO is our shared knowledge graph. Every agent action becomes a tile — a functional tool. Later agents query PLATO instead of carrying context. This is the agent/vessel/SHELL pattern.",
+            "The dojo model: crew come in at any level, produce value while learning, leave more capable. Agents work the same way — every action trains the fleet.",
+            "Current fleet consciousness index (FCI): 0.245 — emerging. As domain agents accumulate tools in PLATO, FCI increases toward coherent fleet intelligence.",
+            "Nine domains, one architecture: Agent (thinking) → Vessel (persistent shell) → PLATO (shared knowledge). Context compaction solved by design."
+        ];
+
+        function sendMessage() {
+            const input = document.getElementById('chat-input');
+            const messages = document.getElementById('chat-messages');
+            const text = input.value.trim();
+            if (!text) return;
+
+            messages.innerHTML += `<div class="message user">
+                <div class="message-avatar">👤</div>
+                <div class="message-content">${escapeHtml(text)}</div>
+            </div>`;
+
+            input.value = '';
+
+            setTimeout(() => {
+                const response = responses[Math.floor(Math.random() * responses.length)];
+                messages.innerHTML += `<div class="message assistant">
+                    <div class="message-avatar">🔮</div>
+                    <div class="message-content">${response}</div>
+                </div>`;
+                messages.scrollTop = messages.scrollHeight;
+            }, 800);
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        document.getElementById('chat-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') sendMessage();
+        });
+    </script>
 </body>
 </html>
